@@ -1,5 +1,5 @@
 from PIL import Image, ImageDraw, ImageFont, ImageColor, ImageFile
-from typing import Type, Tuple, Dict, List, Union
+from typing import Type, Tuple, Dict, List, Union, cast
 import math
 
 from xml.etree.ElementTree import XMLParser
@@ -424,9 +424,22 @@ class SvgPainter:
             (x3, y3) = self.get_coords(float(attrib["x"]) + float(attrib["width"]), float(attrib["y"]) + float(attrib["height"]))
             (x4, y4) = self.get_coords(float(attrib["x"]), float(attrib["y"]) + float(attrib["height"]))
 
-            self.draw.polygon([x1, y1, x2, y2, x3, y3, x4, y4],
-                outline = self.parse_color(self.get_attribute("stroke", "none", False), float(self.get_attribute("stroke-opacity", "1", False))),
-                fill = self.parse_color(self.get_attribute("fill", "none", False), float(self.get_attribute("fill-opacity", "1", False))))
+            if not isinstance(self.draw, ImageDraw.ImageDraw):
+                from aggdraw import Brush, Pen, Draw
+                draw = cast(Draw, self.draw)
+                draw.setantialias(False)
+                self.draw.polygon([x1, y1, x2, y2, x3, y3, x4, y4], Brush('black'))
+                # self.draw.polygon([20, 20, 21, 20, 21, 21, 20, 21], Brush('green'))
+                # self.draw.polygon([20, 0, 21, 0, 21, 1, 20, 1], Brush('blue'))
+                # self.draw.polygon([22, 0, 22, 1, 23, 1, 23, 0], Brush('red'))
+                draw.flush()
+            else:
+                self.draw.polygon([x1, y1, x2, y2, x3, y3, x4, y4],
+                    outline = self.parse_color(self.get_attribute("stroke", "none", True), float(self.get_attribute("stroke-opacity", "1", False))),
+                    fill = self.parse_color(self.get_attribute("fill", "none", True), float(self.get_attribute("fill-opacity", "1", False))))
+                # self.draw.polygon([20, 20, 21, 20, 21, 21, 20, 21], fill='green')
+                # self.draw.polygon([20, 0, 21, 0, 21, 1, 20, 1], fill='blue')
+                # self.draw.polygon([22, 0, 22, 0, 22, 1, 22, 1], fill='red')
 
         elif tag == "ellipse" or tag == "circle":
             cc = 0.55191502449

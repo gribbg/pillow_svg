@@ -560,8 +560,7 @@ def draw_svg_file(file: str, imagedraw: ImageDraw.ImageDraw, imagesize: Tuple[in
 
 
 def _accept(prefix):
-    prefixStr = prefix.decode("utf-8")
-    return "<?xml" in prefixStr or "<svg " in prefixStr or "<!DOC" in prefixStr
+    return b"<?xml" in prefix or b"<svg" in prefix or b"<!DOC" in prefix
 
 
 class SvgImageFile(ImageFile.ImageFile):
@@ -595,3 +594,15 @@ class SvgImageFile(ImageFile.ImageFile):
         self.tile = [("SVGXML", (0, 0) + self.size, 0, (None, self, None, None, svg_default_background))]
 
 
+# ---------------------------------------------------------------------
+# Registry stuff
+
+Image.register_open(SvgImageFile.format, SvgImageFile, _accept)
+# Image.register_save(SvgImageFile.format, _save)  # TODO Where save?
+
+Image.register_decoder(SvgImageFile.format, SvgDecoder)
+# Image.register_encoder(SvgImageFile.format, SvgEncoder)  # TODO Where Encoder?
+
+Image.register_extensions(SvgImageFile.format, [".svg"])
+
+Image.register_mime(SvgImageFile.format, "image/svg+xml")

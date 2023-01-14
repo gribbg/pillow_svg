@@ -38,3 +38,20 @@ def test_quick():
         assert im.size == (24, 24)
         assert_image_similar(im, compare, 1)
 
+
+def test_open_svg_file():
+    for fn in ['rectangle']:
+        Image.open(os.path.join(SVG_DIR, fn + '.svg'))
+
+
+def test_registry():
+    assert 'SVG' in Image.ID
+    assert '.svg' in Image.EXTENSION
+    assert 'SVG' in Image.MIME
+    assert Image.MIME['SVG'] == 'image/svg+xml'
+    # TODO Where save?
+    # assert 'SVG' in Image.SAVE
+
+    assert 'SVG' in Image.DECODERS
+    # TODO Where Encoder?
+    # assert 'SVG' in Image.ENCODERS
